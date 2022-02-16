@@ -12,6 +12,40 @@ import (
 var categoryRepository *repo.CategoryRepoMock = &repo.CategoryRepoMock{Mock: mock.Mock{}}
 var categoryService CategoryServiceImplement = CategoryServiceImplement{Repository: categoryRepository}
 
+func BenchmarkSubCategoryService_Get(b *testing.B) {
+	b.Run("1", func(b *testing.B) {
+		categoryRepository.Mock.On("FindById", "1").Return(nil)
+		for i := 0; i < b.N; i++ {
+			categoryService.Get("1")
+		}
+	})
+	b.Run("3", func(b *testing.B) {
+		category := entity.Category{
+			Name: "Reza Andriansyah3",
+			Id:   "3",
+		}
+		categoryRepository.Mock.On("FindById", "3").Return(category)
+		for i := 0; i < b.N; i++ {
+			categoryService.Get("3")
+		}
+	})
+}
+
+func BenchmarkCategoryService_GetFound(b *testing.B) {
+
+	category := entity.Category{
+		Name: "Reza Andriansyah3",
+		Id:   "3",
+	}
+
+	categoryRepository.Mock.On("FindById", "3").Return(category)
+
+	for i := 0; i < b.N; i++ {
+		categoryService.Get("3")
+	}
+
+}
+
 func TestCategoryService_GetNotFound(t *testing.T) {
 
 	categoryRepository.Mock.On("FindById", "1").Return(nil)
